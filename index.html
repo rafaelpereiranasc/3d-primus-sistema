@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D PRIMUS - Painel Principal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f3f6fa; color: #172b3a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .home-container { text-align: center; width: 100%; max-width: 750px; }
+        
+        .header-logo { margin-bottom: 35px; }
+        .header-logo .icon-box { 
+            width: 70px; height: 70px; background: linear-gradient(135deg, #1769aa, #f28b27); 
+            border-radius: 18px; display: inline-flex; align-items: center; justify-content: center; 
+            color: white; font-size: 30px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(23,105,170,0.25);
+        }
+        .header-logo h1 { color: #10243a; font-size: 32px; font-weight: 800; letter-spacing: 0.5px; }
+        .header-logo p { color: #6d7c8b; font-size: 15px; margin-top: 6px; }
+
+        .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 25px; }
+        .card { 
+            background: white; padding: 40px 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(16,36,58,0.06); 
+            text-decoration: none; color: #172b3a; transition: all 0.3s ease; border-top: 6px solid #1769aa;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+        }
+        .card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(16,36,58,0.12); }
+        .card.prod { border-top-color: #f28b27; }
+        .card i { font-size: 38px; color: #1769aa; margin-bottom: 5px; }
+        .card.prod i { color: #f28b27; }
+        .card h2 { color: #10243a; font-size: 22px; font-weight: 750; }
+        .card p { color: #6d7c8b; font-size: 13px; text-align: center; line-height: 1.4; }
+
+        .footer-info { margin-top: 40px; font-size: 12px; color: #6d7c8b; }
+    </style>
+</head>
+<body>
+
+    <div class="home-container">
+        <div class="header-logo">
+            <div class="icon-box"><i class="fa-solid fa-cube"></i></div>
+            <h1>3D PRIMUS</h1>
+            <p>Rua Luís Domingues, nº 1158 - Centro | Contato: (99) 98178-0355</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Botão para Ordens de Serviço -->
+            <a href="os.html" class="card">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <h2>Ordens de Serviço</h2>
+                <p>Gerencie clientes, controle de OS, valores, pagamentos e termos de garantia.</p>
+            </a>
+
+            <!-- Botão para Produção -->
+            <a href="producao.html" class="card prod">
+                <i class="fa-solid fa-industry"></i>
+                <h2>Produção</h2>
+                <p>Acompanhe a fila de produção, relatórios mensais, comissões e equipe.</p>
+            </a>
+        </div>
+
+        <div class="footer-info">
+            Sistema Local Integrado • Pronto para uso na rede ou pendrive.
+        </div>
+    </div>
+
+</body>
+</html>

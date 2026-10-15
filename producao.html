@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D Primus • Produção & Custos (Nuvem)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- LIB SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --navy: #10243a;
+  --blue: #1769aa;
+  --orange: #f28b27;
+  --bg: #f3f6fa;
+  --ink: #172b3a;
+  --muted: #6d7c8b;
+  --line: #e3e9ef;
+  --white: #fff;
+  --green: #16845b;
+  --red: #c83c48;
+  --yellow: #b77908;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 650; }
+.app { display: flex; min-height: 100vh; }
+.sidebar { width: 240px; background: var(--navy); color: #fff; padding: 24px 15px; display: flex; flex-direction: column; gap: 7px; z-index: 10; position: relative; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 25px; }
+.logo { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #2583cf, var(--orange)); display: grid; place-items: center; font-weight: 900; color: white; }
+.brand strong { display: block; font-size: 15px; letter-spacing: .8px; }
+.brand small { color: #b7c8d7; }
+.nav { color: #c7d4df; background: transparent; text-align: left; padding: 12px; border-radius: 9px; display: flex; align-items: center; gap: 10px; text-decoration: none; border: none; width: 100%; cursor: pointer; font-size: 13.5px; }
+.nav.active, .nav:hover { background: #203d58; color: white; }
+.nav span { display: inline-block; width: 20px; text-align: center; }
+.sidebar .foot { margin-top: auto; color: #a8bdcf; font-size: 12px; line-height: 1.5; padding: 12px; }
+.main { flex: 1; min-width: 0; padding: 28px clamp(16px, 3vw, 36px); }
+.top { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 24px; }
+.eyebrow { color: var(--blue); font-weight: 750; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; }
+.top h1 { margin: 5px 0; font-size: clamp(23px, 3vw, 30px); }
+.sub { color: var(--muted); font-size: 14px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.primary { background: var(--blue); color: #fff; }
+.secondary { background: #e7eff7; color: var(--navy); }
+.danger { background: #fff0f1; color: var(--red); }
+.success { background: #dcfce7; color: #16a34a; }
+.cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 22px; }
+.metric, .panel { background: white; border: 1px solid var(--line); border-radius: 15px; padding: 18px; box-shadow: 0 4px 16px #18344c08; }
+.metric .label { font-size: 13px; color: var(--muted); }
+.metric .value { font-size: 24px; font-weight: 800; margin: 9px 0 4px; }
+.metric .hint { font-size: 12px; color: var(--muted); }
+.metric .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); margin-right: 6px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 22px 0 12px; }
+.section-head h2 { font-size: 18px; margin: 0; }
+.panel { padding: 0; overflow: hidden; }
+.toolbar { padding: 14px; display: flex; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--line); align-items: center; }
+input, select, textarea { border: 1px solid #d8e1e9; border-radius: 9px; padding: 10px 11px; background: white; color: var(--ink); min-width: 0; }
+input:focus, select:focus, textarea:focus { outline: 2px solid #b8d9f4; border-color: var(--blue); }
+.toolbar input { flex: 1; min-width: 180px; }
+.table-wrap { overflow: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 850px; }
+th { text-align: left; background: #f8fafc; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .6px; padding: 13px 14px; }
+td { padding: 14px; border-top: 1px solid var(--line); font-size: 13px; vertical-align: middle; }
+td strong { display: block; font-size: 13px; }
+td small { color: var(--muted); }
+.pill { display: inline-block; border-radius: 20px; padding: 5px 8px; font-size: 11px; font-weight: 750; background: #edf2f7; color: #516272; }
+.pill.done { background: #e1f5eb; color: var(--green); }
+.pill.progress { background: #e7f2ff; color: var(--blue); }
+.pill.wait { background: #fff4d9; color: var(--yellow); }
+.pill.late { background: #ffeaeb; color: var(--red); }
+.pill.fin-concluido { background: #dcfce7; color: #16a34a; }
+.pill.fin-inconsistente { background: #fee2e2; color: #dc2626; }
+.deadline-late { color: var(--red); font-weight: 800; }
+.deadline-soon { color: var(--yellow); font-weight: 800; }
+.row-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+.mini { padding: 6px 8px; font-size: 12px; background: #edf2f7; color: var(--navy); }
+.empty { padding: 35px; text-align: center; color: var(--muted); }
+.hidden { display: none !important; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 18px; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #526373; }
+.field.full { grid-column: 1/-1; }
+.field input, .field select, .field textarea { width: 100%; font-weight: 400; }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; padding: 0 18px 18px; }
+.modal { position: fixed; inset: 0; background: #10243a99; display: grid; place-items: center; padding: 16px; z-index: 1000; }
+.modal-card { background: white; border-radius: 17px; width: min(720px, 100%); max-height: 92vh; overflow: auto; box-shadow: 0 20px 70px #0003; }
+.modal-title { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; }
+.modal-title h2 { margin: 0; font-size: 20px; }
+.close { background: #edf2f7; }
+.moneyline { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.moneyline:last-child { border: 0; }
+.notice { background: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; border-radius: 10px; padding: 12px 14px; font-size: 13px; margin: 16px 0; }
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--navy); color: white; padding: 12px 18px; border-radius: 10px; z-index: 2000; box-shadow: 0 8px 25px #0002; }
+.smallmuted { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><div class="logo">3D</div><div><strong>3D PRIMUS</strong><small>Gestão de produção</small></div></div>
+ <button type="button" class="nav active" id="btn-dashboard" onclick="mudarAba('dashboard')"><span>▦</span><b class="navtext">Visão geral</b></button>
+ <button type="button" class="nav" id="btn-orders" onclick="mudarAba('orders')"><span>▤</span><b class="navtext">Pedidos</b></button>
+ <button type="button" class="nav" id="btn-costCalculator" onclick="mudarAba('costCalculator')"><span>🧮</span><b class="navtext">Custo de Produção</b></button>
+ <button type="button" class="nav" id="btn-finance" onclick="mudarAba('finance')"><span>＄</span><b class="navtext">Financeiro & Custos</b></button>
+ <button type="button" class="nav" id="btn-commissions" onclick="mudarAba('commissions')"><span>％</span><b class="navtext">Comissões (7%) & Relatório</b></button>
+ <button type="button" class="nav" id="btn-backup" onclick="mudarAba('backup')"><span>↻</span><b class="navtext">Backup e dados</b></button>
+ <div class="foot">Produção organizada.<br>3D Primus 2026.</div>
+</aside>
+
+<main class="main">
+<header class="top">
+ <div>
+  <div class="eyebrow">Painel de controle</div>
+  <h1 id="pageTitle">Visão geral</h1>
+  <div class="sub" id="pageSub">Acompanhe a produção da sua loja em um só lugar.</div>
+ </div>
+ <div class="actions">
+  <button type="button" class="secondary" onclick="exportBackup()">↓ Backup JSON</button>
+  <button type="button" class="primary" onclick="openOrder()">＋ Novo pedido</button>
+ </div>
+</header>
+
+<!-- SEÇÃO VISÃO GERAL -->
+<section id="dashboardPage" class="page-sec">
+ <div class="cards" id="dashMetrics"></div>
+ <div class="section-head"><h2>Fila de produção</h2><button type="button" class="secondary" onclick="mudarAba('orders')">Ver todos →</button></div>
+ <div class="panel"><div class="table-wrap"><table><thead><tr><th>Pedido / cliente</th><th>Prazo</th><th>Status Prod.</th><th>Status Fin.</th><th>Responsável</th><th>Ações</th></tr></thead><tbody id="dashRows"></tbody></table></div></div>
+ <div class="notice"><i class="fa-solid fa-cloud"></i> Sistema conectado à nuvem Supabase em tempo real.</div>
+</section>
+
+<!-- SEÇÃO PEDIDOS -->
+<section id="ordersPage" class="page-sec hidden">
+ <div class="section-head"><h2>Todos os pedidos</h2><span class="smallmuted" id="orderCount"></span></div>
+ <div class="panel">
+  <div class="toolbar">
+   <input id="searchOrders" placeholder="Buscar por cliente, telefone ou produto..." oninput="renderOrders()">
+   <select id="filterStatus" onchange="renderOrders()">
+    <option value="">Status Produção (Todos)</option>
+    <option>Orçamento</option>
+    <option>Aguardando material</option>
+    <option>Em produção</option>
+    <option>Finalizado</option>
+    <option>Entregue</option>
+    <option>Cancelado</option>
+   </select>
+   <select id="filterFinancial" onchange="renderOrders()">
+    <option value="">Status Financeiro (Todos)</option>
+    <option value="Pendente">Pendente</option>
+    <option value="Concluído">Concluído (OK)</option>
+    <option value="Inconsistente">Inconsistente (Erro/Divergência)</option>
+   </select>
+   <select id="sortOrders" onchange="renderOrders()">
+    <option value="deadline">Ordenar por prazo</option>
+    <option value="newest">Mais recentes</option>
+   </select>
+  </div>
+  <div class="table-wrap"><table><thead><tr><th>Pedido / cliente</th><th>Início</th><th>Prazo</th><th>Prod.</th><th>Fin.</th><th>Total</th><th>Custo</th><th>Comissão (7%)</th><th>Resp.</th><th>Ações</th></tr></thead><tbody id="orderRows"></tbody></table></div>
+ </div>
+</section>
+
+<!-- SEÇÃO CUSTO DE PRODUÇÃO -->
+<section id="costCalculatorPage" class="page-sec hidden">
+ <div class="section-head">
+    <h2>Calculadora e Precificação de Peças 3D</h2>
+    <span class="smallmuted">Baseado na planilha de custos da loja</span>
+ </div>
+ <div class="panel" style="padding: 20px; margin-bottom: 20px;">
+    <h3 style="margin-top:0; font-size:16px; color:var(--navy); margin-bottom:15px;"><i class="fa-solid fa-calculator"></i> Novo Cálculo de Peça</h3>
+    <form id="costForm" onsubmit="saveCostItem(event)">
+       <input type="hidden" id="costId">
+       <div class="form-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+          <label class="field">Nome da Peça / Modelo *<input id="cName" required placeholder="Ex: Suporte Headset"></label>
+          <label class="field">Tempo de Impressão (Minutos) *<input id="cTime" type="number" min="0" required placeholder="Ex: 180" oninput="liveCalc()"></label>
+          <label class="field">Peso do Material (Gramas) *<input id="cWeight" type="number" min="0" step="0.1" required placeholder="Ex: 45" oninput="liveCalc()"></label>
+          
+          <label class="field">Valor do Filamento (R$ / kg) *<input id="cFilamentPrice" type="number" min="0" step="0.01" value="130.00" required oninput="liveCalc()"></label>
+          <label class="field">Mão de Obra (Horas dedicadas)<input id="cLaborHours" type="number" min="0" step="0.1" value="0" placeholder="Ex: 0.5" oninput="liveCalc()"></label>
+          <label class="field">Insumos (Cola, lixa, embalagem - R$)<input id="cSupplies" type="number" min="0" step="0.01" value="1.35" placeholder="1.35" oninput="liveCalc()"></label>
+          
+          <label class="field">Fator de Markup (Multiplicador) *<input id="cMarkup" type="number" min="1" step="0.1" value="3.0" required oninput="liveCalc()"></label>
+       </div>
+       
+       <div style="background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:15px; margin: 15px 0; display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; text-align:center;">
+          <div><small class="smallmuted">Custo Material</small><div id="previewMaterial" style="font-weight:800; font-size:15px; color:var(--navy)">R$ 0,00</div></div>
+          <div><small class="smallmuted">Energia</small><div id="previewEnergy" style="font-weight:800; font-size:15px; color:var(--navy)">R$ 0,00</div></div>
+          <div><small class="smallmuted">Depreciação</small><div id="previewDeprec" style="font-weight:800; font-size:15px; color:var(--navy)">R$ 0,00</div></div>
+          <div><small class="smallmuted">Custo Total</small><div id="previewTotalCost" style="font-weight:800; font-size:15px; color:var(--red)">R$ 0,00</div></div>
+          <div><small class="smallmuted">VALOR FINAL (Venda)</small><div id="previewFinalPrice" style="font-weight:800; font-size:16px; color:var(--green)">R$ 0,00</div></div>
+       </div>
+
+       <div class="form-actions">
+          <button type="button" class="secondary" onclick="resetCostForm()">Limpar</button>
+          <button type="submit" class="primary">Salvar na Tabela de Custos</button>
+       </div>
+    </form>
+ </div>
+
+ <div class="panel">
+    <div class="toolbar">
+       <input id="searchCost" placeholder="Buscar peça calculada..." oninput="renderCostTable()">
+    </div>
+    <div class="table-wrap">
+       <table>
+          <thead>
+             <tr>
+                <th>Peça / Modelo</th>
+                <th>Tempo</th>
+                <th>Peso</th>
+                <th>Custo Mat.</th>
+                <th>Custo Total</th>
+                <th>Markup</th>
+                <th>Valor Final</th>
+                <th>Lucro Líq.</th>
+                <th>Ações</th>
+             </tr>
+          </thead>
+          <tbody id="costRows"></tbody>
+       </table>
+    </div>
+ </div>
+</section>
+
+<!-- SEÇÃO FINANCEIRO & CUSTOS -->
+<section id="financePage" class="page-sec hidden">
+ <div class="cards" id="financeMetrics"></div>
+ <div class="grid2">
+  <div class="panel" style="padding:18px"><h2 style="font-size:17px;margin:0 0 12px">Resumo Financeiro & Custos</h2><div id="financeSummary"></div></div>
+  <div class="panel" style="padding:18px"><h2 style="font-size:17px;margin:0 0 12px">Pedidos Inconsistentes (Atenção Financeira)</h2><div id="inconsistentList"></div></div>
+ </div>
+</section>
+
+<!-- SEÇÃO COMISSÕES & RELATÓRIO -->
+<section id="commissionsPage" class="page-sec hidden">
+ <div class="toolbar panel" style="padding:14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+        <label class="smallmuted" for="commissionMonth">Mês de apuração:</label>
+        <input type="month" id="commissionMonth" onchange="renderCommissions()" style="max-width:200px">
+    </div>
+    <span class="smallmuted">Comissão padrão: <b>7%</b> sobre o valor total concluído.</span>
+    <button type="button" class="primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir Prestação de Contas</button>
+ </div>
+ <div class="cards" id="commissionMetrics"></div>
+ <div class="panel"><div class="table-wrap"><table><thead><tr><th>Responsável</th><th>Pedidos Concluídos</th><th>Valor Produzido</th><th>Custo Total Peças</th><th>Comissão (7%)</th></tr></thead><tbody id="commissionRows"></tbody></table></div></div>
+ <div class="notice">A comissão de 7% e o custo são apurados sobre pedidos com status financeiro <b>Concluído</b> no mês selecionado.</div>
+</section>
+
+<!-- SEÇÃO BACKUP -->
+<section id="backupPage" class="page-sec hidden">
+ <div class="grid2">
+  <div class="panel" style="padding:20px"><h2 style="margin-top:0;font-size:18px">Exportar backup</h2><p class="sub">Gera um arquivo JSON com os pedidos cadastrados.</p><button type="button" class="primary" onclick="exportBackup()">↓ Baixar backup</button></div>
+  <div class="panel" style="padding:20px"><h2 style="margin-top:0;font-size:18px">Dados locais & Nuvem</h2>
+  <div class="moneyline"><span>Pedidos na Nuvem</span><strong id="backupCount">0</strong></div>
+  <div class="moneyline"><span>Status da Conexão</span><strong style="color:var(--green)">Supabase Conectado</strong></div>
+  <button type="button" class="danger" onclick="clearAll()">Apagar todos os dados na nuvem</button></div>
+ </div>
+</section>
+
+</main>
+</div>
+
+<!-- MODAL CADASTRO / EDIÇÃO DE PEDIDOS -->
+<div class="modal hidden" id="orderModal">
+ <div class="modal-card">
+  <div class="modal-title"><h2 id="modalTitle">Novo pedido</h2><button type="button" class="close" onclick="closeModal()">✕</button></div>
+  <form id="orderForm" onsubmit="saveOrder(event)">
+   <input type="hidden" id="orderId">
+   <div class="form-grid">
+    <label class="field">Nome do cliente *<input id="client" required placeholder="Nome completo"></label>
+    <label class="field">Telefone / WhatsApp<input id="phone" placeholder="(99) 99999-9999"></label>
+    <label class="field full">Produto / descrição da peça *<input id="product" required placeholder="Ex.: peça personalizada, suporte..."></label>
+    <label class="field">Data de início *<input id="startDate" type="date" required></label>
+    <label class="field">Prazo de entrega *<input id="deadline" type="date" required></label>
+    <label class="field">Status de Produção<select id="status"><option>Orçamento</option><option>Aguardando material</option><option selected>Em produção</option><option>Finalizado</option><option>Entregue</option><option>Cancelado</option></select></label>
+    <label class="field">Status Financeiro (Gestão)<select id="financialStatus"><option value="Pendente">Pendente</option><option value="Concluído">Concluído (Tudo Certo)</option><option value="Inconsistente">Inconsistente (Erro/Divergência)</option></select></label>
+    <label class="field">Responsável pela produção<select id="responsible"><option value="Rafael">Rafael</option><option value="Daniel">Daniel</option><option value="Outro">Outro</option></select></label>
+    <label class="field">Valor total da venda (R$) *<input id="total" type="number" min="0" step=".01" required placeholder="0,00"></label>
+    <label class="field">Preço de custo da peça (R$) *<input id="cost" type="number" min="0" step=".01" required placeholder="0,00"></label>
+    <label class="field">Valor já recebido / entrada (R$)<input id="paid" type="number" min="0" step=".01" value="0" placeholder="0,00"></label>
+    <label class="field">Forma de pagamento<select id="paymentMethod"><option>Pix</option><option>Dinheiro</option><option>Cartão</option><option>Transferência</option><option>Outro</option><option>A combinar</option></select></label>
+    <label class="field full">Observações / Notas Administrativas<textarea id="notes" rows="2" placeholder="Detalhes de pagamento, divergências, material..."></textarea></label>
+   </div>
+   <div class="form-actions">
+    <button type="button" class="secondary" onclick="closeModal()">Cancelar</button>
+    <button type="submit" class="primary">Salvar pedido</button>
+   </div>
+  </form>
+ </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<!-- LIGAÇÃO COM O SCRIPT EXTERNO CORRETO -->
+<script src="producao.js"></script>
+</body>
+</html>

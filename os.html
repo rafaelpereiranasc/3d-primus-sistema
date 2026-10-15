@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D PRIMUS OS - Ordens de Serviço</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f1f5f9; color: #334155; padding-bottom: 40px; }
+
+        /* Header Principal */
+        .header {
+            background: linear-gradient(135deg, #10243a, #1769aa);
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .header .brand { display: flex; align-items: center; gap: 12px; }
+        .header .brand i { font-size: 24px; color: #f28b27; }
+        .header .brand h1 { font-size: 20px; font-weight: 700; }
+        .header .brand p { font-size: 12px; color: #c7d2fe; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+
+        .btn-header {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-header:hover { background: rgba(255, 255, 255, 0.3); }
+
+        /* Container Principal */
+        .main-container { max-width: 1280px; margin: 25px auto; padding: 0 20px; }
+
+        /* NAVEGAÇÃO POR ABAS */
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .tab-btn {
+            background: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: #1769aa;
+            color: white;
+            box-shadow: 0 4px 12px rgba(23, 105, 170, 0.3);
+        }
+
+        /* Cartões de Métricas */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .metric-info label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric-info h2 { font-size: 24px; color: #1e293b; margin-top: 4px; font-weight: 800; }
+        .metric-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .bg-blue { background: #e0f2fe; color: #0284c7; }
+        .bg-amber { background: #fef3c7; color: #d97706; }
+        .bg-emerald { background: #dcfce7; color: #16a34a; }
+        .bg-green-total { background: #d1fae5; color: #059669; }
+
+        /* Barra de Ações e Filtros */
+        .control-bar {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        .btn-action {
+            background: #1769aa;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .btn-action:hover { background: #125182; }
+
+        .search-filters { display: flex; gap: 12px; flex: 1; justify-content: flex-end; flex-wrap: wrap; }
+        .search-filters select, .search-filters input {
+            padding: 9px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8fafc;
+            outline: none;
+        }
+        .search-filters input { width: 250px; }
+
+        /* Tabelas */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th {
+            background: #f8fafc;
+            padding: 14px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        td { padding: 14px 18px; font-size: 14px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        tr:hover { background: #f8fafc; }
+
+        /* Badges de Status */
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .status-aberto { background: #e0f2fe; color: #0369a1; }
+        .status-andamento { background: #fef3c7; color: #b45309; }
+        .status-pendente { background: #fee2e2; color: #b91c1c; }
+        .status-concluido { background: #dcfce7; color: #15803d; }
+
+        /* Modais */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { font-size: 18px; color: #1e293b; }
+        .close-modal { background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.span-2 { grid-column: span 2; }
+        .form-group.span-3 { grid-column: span 3; }
+        .form-group label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+
+        .table-actions { display: flex; gap: 8px; }
+        .btn-tbl { background: none; border: none; cursor: pointer; font-size: 15px; padding: 4px; border-radius: 4px; }
+        .btn-tbl-print { color: #0284c7; }
+        .btn-tbl-wa { color: #16a34a; }
+        .btn-tbl-edit { color: #1769aa; }
+        .btn-tbl-delete { color: #dc2626; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printableOS, #printableOS * { visibility: visible; }
+            #printableOS { position: absolute; left: 0; top: 0; width: 100%; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Principal -->
+    <header class="header">
+        <div class="brand">
+            <i class="fa-solid fa-wrench"></i>
+            <div>
+                <h1>3D PRIMUS OS</h1>
+                <p>Gestão de Ordens de Serviço & Clientes</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="btn-header"><i class="fa-solid fa-house"></i> Página Inicial</a>
+            <button class="btn-header" onclick="fazerBackup()"><i class="fa-solid fa-download"></i> Backup Físico</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Abas de Navegação -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tab-os-btn" onclick="alternarAba('os')"><i class="fa-solid fa-gauge"></i> Dashboard & OS</button>
+            <button class="tab-btn" id="tab-clientes-btn" onclick="alternarAba('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
+            <button class="tab-btn" id="tab-garantia-btn" onclick="alternarAba('garantia')"><i class="fa-solid fa-file-contract"></i> Termos de Garantia</button>
+        </div>
+
+        <!-- ABA DASHBOARD & OS -->
+        <div id="aba-os">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-info"><label>TOTAL OS</label><h2 id="total-os">0</h2></div>
+                    <div class="metric-icon bg-blue"><i class="fa-regular fa-file-lines"></i></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-info"><label>EM ABERTO</label><h2 id="aberto-os" style="color: #0284c7;">0</h2></div>
+                    <div class="metric-icon bg-blue"><i class="fa-regular fa-folder-open"></i></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-info"><label>PENDENTES</label><h2 id="pendentes-os" style="color: #d97706;">0</h2></div>
+                    <div class="metric-icon bg-amber"><i class="fa-regular fa-clock"></i></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-info"><label>CONCLUÍDAS</label><h2 id="concluidas-os" style="color: #16a34a;">0</h2></div>
+                    <div class="metric-icon bg-emerald"><i class="fa-regular fa-circle-check"></i></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-info"><label>FATURAMENTO</label><h2 id="faturamento-os" style="color: #059669;">R$ 0,00</h2></div>
+                    <div class="metric-icon bg-green-total"><i class="fa-solid fa-sack-dollar"></i></div>
+                </div>
+            </div>
+
+            <div class="control-bar">
+                <button class="btn-action" onclick="abrirModalOS()"><i class="fa-solid fa-plus"></i> Nova Ordem de Serviço</button>
+                <div class="search-filters">
+                    <select id="filtroEquipamento" onchange="carregarTabelaOS()">
+                        <option value="">Todos Equipamentos</option>
+                        <option value="PC/Notebook">PC/Notebook</option>
+                        <option value="Impressora 3D">Impressora 3D</option>
+                        <option value="Celular">Celular</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                    <select id="filtroStatus" onchange="carregarTabelaOS()">
+                        <option value="todos">Todos os Status</option>
+                        <option value="Aberto">Aberto</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Pendente">Pendente</option>
+                        <option value="Fechado">Concluído/Fechado</option>
+                    </select>
+                    <input type="text" id="buscaOS" placeholder="Buscar OS, cliente ou aparelho..." onkeyup="carregarTabelaOS()">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nº OS</th>
+                            <th>CLIENTE</th>
+                            <th>TIPO / EQUIPAMENTO</th>
+                            <th>DATA ENTRADA</th>
+                            <th>VALOR TOTAL</th>
+                            <th>STATUS</th>
+                            <th>AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-os-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA CLIENTES -->
+        <div id="aba-clientes" style="display: none;">
+            <div class="control-bar">
+                <button class="btn-action" onclick="abrirModalCliente()"><i class="fa-solid fa-user-plus"></i> Cadastrar Novo Cliente</button>
+                <div class="search-filters">
+                    <input type="text" id="buscaCliente" placeholder="Buscar cliente por nome ou telefone..." onkeyup="carregarTabelaClientes()">
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>NOME</th>
+                            <th>TELEFONE / WHATSAPP</th>
+                            <th>CPF / CNPJ</th>
+                            <th>ENDEREÇO</th>
+                            <th>AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-clientes-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA GARANTIA -->
+        <div id="aba-garantia" style="display: none;">
+            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <h3 style="margin-bottom: 10px; color: #1e293b;">Cláusulas e Termos de Garantia Padrão</h3>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Este texto será automaticamente impresso na parte inferior de todas as Ordens de Serviço.</p>
+                <textarea id="textoGarantia" rows="10" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;"></textarea>
+                <button class="btn-action" style="margin-top: 15px;" onclick="salvarGarantia()"><i class="fa-solid fa-floppy-disk"></i> Salvar Termos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL OS -->
+    <div class="modal-overlay" id="modalOS">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tituloModalOS">Nova Ordem de Serviço</h3>
+                <button class="close-modal" onclick="fecharModalOS()">&times;</button>
+            </div>
+            <form id="formOS" onsubmit="salvarOS(event)">
+                <input type="hidden" id="osId">
+                <div class="form-grid">
+                    <div class="form-group span-2">
+                        <label>SELECIONE O CLIENTE *</label>
+                        <select id="osCliente" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>STATUS DA OS</label>
+                        <select id="osStatus">
+                            <option value="Aberto">Aberto</option>
+                            <option value="Em Andamento">Em Andamento</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Fechado">Concluído/Fechado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>TIPO DE EQUIPAMENTO</label>
+                        <select id="osEquipmentType">
+                            <option value="PC/Notebook">PC/Notebook</option>
+                            <option value="Impressora 3D">Impressora 3D</option>
+                            <option value="Celular">Celular</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group span-2">
+                        <label>EQUIPAMENTO / DESCRIÇÃO *</label>
+                        <input type="text" id="osEquipamento" required placeholder="Ex: Dell Inspiron / Ender 3 V2">
+                    </div>
+                    <div class="form-group">
+                        <label>MARCA</label>
+                        <input type="text" id="osMarca" placeholder="Ex: Creality / Dell">
+                    </div>
+                    <div class="form-group span-2">
+                        <label>MODELO / Nº SÉRIE</label>
+                        <input type="text" id="osModelo" placeholder="Ex: Ender 3 Pro / SN: 1234">
+                    </div>
+                    <div class="form-group span-3">
+                        <label>DEFEITO INFORMADO</label>
+                        <textarea id="osDefeito" rows="2" placeholder="Relato do cliente..."></textarea>
+                    </div>
+                    <div class="form-group span-3">
+                        <label>DIAGNÓSTICO / OBSERVAÇÕES / PROCEDIMENTOS</label>
+                        <textarea id="osServico" rows="2" placeholder="Procedimentos efetuados, testes ou peças..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>VALOR PEÇAS (R$)</label>
+                        <input type="number" step="0.01" id="osValorPecas" value="0.00" oninput="calcularTotalOS()">
+                    </div>
+                    <div class="form-group">
+                        <label>VALOR MÃO DE OBRA (R$)</label>
+                        <input type="number" step="0.01" id="osValorMaoObra" value="0.00" oninput="calcularTotalOS()">
+                    </div>
+                    <div class="form-group">
+                        <label>DESCONTO (R$)</label>
+                        <input type="number" step="0.01" id="osDesconto" value="0.00" oninput="calcularTotalOS()">
+                    </div>
+                    <div class="form-group">
+                        <label>VALOR TOTAL (R$)</label>
+                        <input type="number" step="0.01" id="osValorTotal" value="0.00" readonly style="background: #f1f5f9; font-weight: bold; color: #059669;">
+                    </div>
+                    <div class="form-group span-2">
+                        <label>FORMA DE PAGAMENTO</label>
+                        <select id="osFormaPagamento">
+                            <option value="A Definir">A Definir</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="PIX">PIX</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="Boleto">Boleto</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-header" style="color: #333;" onclick="fecharModalOS()">Cancelar</button>
+                    <button type="submit" class="btn-action"><i class="fa-solid fa-check"></i> Salvar OS</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CLIENTE -->
+    <div class="modal-overlay" id="modalCliente">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3>Cadastrar Novo Cliente</h3>
+                <button class="close-modal" onclick="fecharModalCliente()">&times;</button>
+            </div>
+            <form id="formCliente" onsubmit="salvarCliente(event)">
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="form-group span-2">
+                        <label>NOME COMPLETO *</label>
+                        <input type="text" id="cliNome" required placeholder="Ex: João da Silva">
+                    </div>
+                    <div class="form-group">
+                        <label>TELEFONE / WHATSAPP *</label>
+                        <input type="text" id="cliTelefone" required placeholder="Ex: 99981780355">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF / CNPJ</label>
+                        <input type="text" id="cliCpf" placeholder="000.000.000-00">
+                    </div>
+                    <div class="form-group span-2">
+                        <label>ENDEREÇO</label>
+                        <input type="text" id="cliEndereco" placeholder="Rua, Número, Bairro">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-header" style="color: #333;" onclick="fecharModalCliente()">Cancelar</button>
+                    <button type="submit" class="btn-action"><i class="fa-solid fa-user-check"></i> Salvar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ÁREA DE IMPRESSÃO DE 2 VIAS NA MESMA FOLHA -->
+    <div id="printableOS" style="display: none;"></div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/data';
+        let dadosOS = [];
+        let clientesDB = [];
+        let termosGarantia = '';
+
+        const termoPadrao = "1. A garantia dos serviços prestados é de 90 dias a contar da data de entrega do equipamento.\n2. A garantia cobre exclusivamente os serviços executados e peças substituídas informadas nesta OS.\n3. A garantia será anulada em caso de violação dos lacres, quedas ou mau uso.";
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await carregarDadosDoServidor();
+            if (!termosGarantia) {
+                termosGarantia = termoPadrao;
+            }
+            document.getElementById('textoGarantia').value = termosGarantia;
+            
+            carregarTabelaOS();
+            carregarTabelaClientes();
+            atualizarMetrics();
+        });
+
+        async function carregarDadosDoServidor() {
+            try {
+                let res = await fetch(API_URL);
+                let data = await res.json();
+                dadosOS = data.ordens_servico || [];
+                clientesDB = data.clientes || [];
+                termosGarantia = data.garantia || termoPadrao;
+            } catch(e) {
+                console.error("Erro ao carregar dados do servidor local:", e);
+                dadosOS = JSON.parse(localStorage.getItem('ordens_servico')) || [];
+                clientesDB = JSON.parse(localStorage.getItem('clientes_db')) || [];
+                termosGarantia = localStorage.getItem('termos_garantia') || termoPadrao;
+            }
+        }
+
+        async function salvarDadosNoServidor() {
+            try {
+                let res = await fetch(API_URL);
+                let dataAtual = await res.json().catch(() => ({}));
+                
+                // Mantém os dados de produção intactos e atualiza apenas as ordens de serviço e clientes
+                dataAtual.ordens_servico = dadosOS;
+                dataAtual.clientes = clientesDB;
+                dataAtual.garantia = termosGarantia;
+
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataAtual)
+                });
+            } catch(e) {
+                console.error("Erro ao sincronizar com servidor local:", e);
+            }
+            localStorage.setItem('ordens_servico', JSON.stringify(dadosOS));
+            localStorage.setItem('clientes_db', JSON.stringify(clientesDB));
+            localStorage.setItem('termos_garantia', termosGarantia);
+        }
+
+        function alternarAba(aba) {
+            document.getElementById('aba-os').style.display = aba === 'os' ? 'block' : 'none';
+            document.getElementById('aba-clientes').style.display = aba === 'clientes' ? 'block' : 'none';
+            document.getElementById('aba-garantia').style.display = aba === 'garantia' ? 'block' : 'none';
+
+            document.getElementById('tab-os-btn').classList.toggle('active', aba === 'os');
+            document.getElementById('tab-clientes-btn').classList.toggle('active', aba === 'clientes');
+            document.getElementById('tab-garantia-btn').classList.toggle('active', aba === 'garantia');
+        }
+
+        /* CLIENTES */
+        function abrirModalCliente() { document.getElementById('modalCliente').style.display = 'flex'; }
+        function fecharModalCliente() { document.getElementById('modalCliente').style.display = 'none'; document.getElementById('formCliente').reset(); }
+
+        async function salvarCliente(e) {
+            e.preventDefault();
+            const novoCliente = {
+                id: Date.now(),
+                nome: document.getElementById('cliNome').value,
+                telefone: document.getElementById('cliTelefone').value,
+                cpf: document.getElementById('cliCpf').value,
+                endereco: document.getElementById('cliEndereco').value
+            };
+            clientesDB.push(novoCliente);
+            await salvarDadosNoServidor();
+            fecharModalCliente();
+            carregarTabelaClientes();
+        }
+
+        function carregarTabelaClientes() {
+            const busca = document.getElementById('buscaCliente').value.toLowerCase();
+            const tbody = document.getElementById('tabela-clientes-body');
+            tbody.innerHTML = '';
+
+            clientesDB.filter(c => c.nome.toLowerCase().includes(busca) || c.telefone.includes(busca)).forEach(c => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${c.nome}</strong></td>
+                        <td>${c.telefone}</td>
+                        <td>${c.cpf || '-'}</td>
+                        <td>${c.endereco || '-'}</td>
+                        <td>
+                            <button class="btn-tbl btn-tbl-delete" onclick="excluirCliente(${c.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function excluirCliente(id) {
+            if (confirm('Deseja excluir este cliente?')) {
+                clientesDB = clientesDB.filter(c => c.id !== id);
+                await salvarDadosNoServidor();
+                carregarTabelaClientes();
+            }
+        }
+
+        /* ORDENS DE SERVIÇO */
+        function abrirModalOS(osId = null) {
+            const selectCli = document.getElementById('osCliente');
+            selectCli.innerHTML = '<option value="">Selecione um cliente...</option>';
+
+            if (clientesDB.length === 0) {
+                alert('Cadastre um cliente primeiro na aba "Clientes".');
+                alternarAba('clientes');
+                return;
+            }
+
+            clientesDB.forEach(c => {
+                selectCli.innerHTML += `<option value="${c.id}">${c.nome} (${c.telefone})</option>`;
+            });
+
+            if (osId) {
+                const os = dadosOS.find(o => o.numOS === osId);
+                if (os) {
+                    document.getElementById('osId').value = os.numOS;
+                    document.getElementById('osCliente').value = os.clienteId;
+                    document.getElementById('osStatus').value = os.status;
+                    document.getElementById('osEquipmentType').value = os.equipmentType || 'Outros';
+                    document.getElementById('osEquipamento').value = os.equipamento || '';
+                    document.getElementById('osMarca').value = os.marca || '';
+                    document.getElementById('osModelo').value = os.modelo || '';
+                    document.getElementById('osDefeito').value = os.defeito || '';
+                    document.getElementById('osServico').value = os.servico || '';
+                    document.getElementById('osValorPecas').value = os.valorPecas || 0;
+                    document.getElementById('osValorMaoObra').value = os.valorMaoObra || 0;
+                    document.getElementById('osDesconto').value = os.desconto || 0;
+                    document.getElementById('osValorTotal').value = os.valorTotal || 0;
+                    document.getElementById('osFormaPagamento').value = os.formaPagamento || 'A Definir';
+                    document.getElementById('tituloModalOS').innerText = `Editar Ordem de Serviço #${os.numOS}`;
+                }
+            } else {
+                document.getElementById('formOS').reset();
+                document.getElementById('osId').value = '';
+                document.getElementById('osEquipmentType').value = 'PC/Notebook';
+                document.getElementById('tituloModalOS').innerText = 'Nova Ordem de Serviço';
+            }
+
+            document.getElementById('modalOS').style.display = 'flex';
+        }
+
+        function fecharModalOS() { document.getElementById('modalOS').style.display = 'none'; }
+
+        function calcularTotalOS() {
+            const pecas = parseFloat(document.getElementById('osValorPecas').value) || 0;
+            const maoObra = parseFloat(document.getElementById('osValorMaoObra').value) || 0;
+            const desconto = parseFloat(document.getElementById('osDesconto').value) || 0;
+            const total = Math.max(0, (pecas + maoObra) - desconto);
+            document.getElementById('osValorTotal').value = total.toFixed(2);
+        }
+
+        async function salvarOS(e) {
+            e.preventDefault();
+            const osId = document.getElementById('osId').value;
+            const clienteSel = clientesDB.find(c => c.id == document.getElementById('osCliente').value);
+
+            if (osId) {
+                const index = dadosOS.findIndex(o => o.numOS == osId);
+                if (index !== -1) {
+                    dadosOS[index].clienteId = clienteSel.id;
+                    dadosOS[index].clienteNome = clienteSel.nome;
+                    dadosOS[index].clienteFone = clienteSel.telefone;
+                    dadosOS[index].status = document.getElementById('osStatus').value;
+                    dadosOS[index].equipmentType = document.getElementById('osEquipmentType').value;
+                    dadosOS[index].equipamento = document.getElementById('osEquipamento').value;
+                    dadosOS[index].marca = document.getElementById('osMarca').value;
+                    dadosOS[index].modelo = document.getElementById('osModelo').value;
+                    dadosOS[index].defeito = document.getElementById('osDefeito').value;
+                    dadosOS[index].servico = document.getElementById('osServico').value;
+                    dadosOS[index].valorPecas = parseFloat(document.getElementById('osValorPecas').value) || 0;
+                    dadosOS[index].valorMaoObra = parseFloat(document.getElementById('osValorMaoObra').value) || 0;
+                    dadosOS[index].desconto = parseFloat(document.getElementById('osDesconto').value) || 0;
+                    dadosOS[index].valorTotal = parseFloat(document.getElementById('osValorTotal').value) || 0;
+                    dadosOS[index].formaPagamento = document.getElementById('osFormaPagamento').value;
+                }
+            } else {
+                const proximoNum = dadosOS.length > 0 ? (dadosOS[dadosOS.length - 1].numOS + 1) : 1001;
+                const novaOS = {
+                    numOS: proximoNum,
+                    clienteId: clienteSel.id,
+                    clienteNome: clienteSel.nome,
+                    clienteFone: clienteSel.telefone,
+                    status: document.getElementById('osStatus').value,
+                    equipmentType: document.getElementById('osEquipmentType').value,
+                    equipamento: document.getElementById('osEquipamento').value,
+                    marca: document.getElementById('osMarca').value,
+                    modelo: document.getElementById('osModelo').value,
+                    defeito: document.getElementById('osDefeito').value,
+                    servico: document.getElementById('osServico').value,
+                    valorPecas: parseFloat(document.getElementById('osValorPecas').value) || 0,
+                    valorMaoObra: parseFloat(document.getElementById('osValorMaoObra').value) || 0,
+                    desconto: parseFloat(document.getElementById('osDesconto').value) || 0,
+                    valorTotal: parseFloat(document.getElementById('osValorTotal').value) || 0,
+                    formaPagamento: document.getElementById('osFormaPagamento').value,
+                    dataEntrada: new Date().toLocaleDateString('pt-BR'),
+                    garantia: termosGarantia
+                };
+                dadosOS.push(novaOS);
+            }
+
+            await salvarDadosNoServidor();
+            fecharModalOS();
+            carregarTabelaOS();
+            atualizarMetrics();
+        }
+
+        function carregarTabelaOS() {
+            const filtroStatus = document.getElementById('filtroStatus').value;
+            const filtroEquip = document.getElementById('filtroEquipamento').value;
+            const busca = document.getElementById('buscaOS').value.toLowerCase();
+            const tbody = document.getElementById('tabela-os-body');
+            tbody.innerHTML = '';
+
+            const filtradas = dadosOS.filter(o => {
+                const statusOS = o.status || 'Aberto';
+                const eqTipo = o.equipmentType || 'Outros';
+                const bateStatus = filtroStatus === 'todos' || statusOS === filtroStatus;
+                const bateEquip = !filtroEquip || eqTipo === filtroEquip;
+                const bateBusca = o.numOS.toString().includes(busca) ||
+                                  o.clienteNome.toLowerCase().includes(busca) ||
+                                  o.equipamento.toLowerCase().includes(busca);
+                return bateStatus && bateEquip && bateBusca;
+            });
+
+            filtradas.forEach(o => {
+                let badgeClass = 'status-aberto';
+                if (o.status === 'Em Andamento') badgeClass = 'status-andamento';
+                if (o.status === 'Pendente') badgeClass = 'status-pendente';
+                if (o.status === 'Fechado') badgeClass = 'status-concluido';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong style="color: #1769aa;">#${o.numOS}</strong></td>
+                        <td><strong>${o.clienteNome}</strong></td>
+                        <td>${o.equipamento} <small style="color:var(--blue)">[${o.equipmentType || 'Outros'}]</small></td>
+                        <td>${o.dataEntrada}</td>
+                        <td><strong>R$ ${(o.valorTotal || 0).toFixed(2)}</strong></td>
+                        <td><span class="status-badge ${badgeClass}">${o.status}</span></td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="btn-tbl btn-tbl-print" title="Imprimir OS (2 Vias)" onclick="imprimirOS2Vias(${o.numOS})"><i class="fa-solid fa-print"></i></button>
+                                <button class="btn-tbl btn-tbl-wa" title="Enviar WhatsApp" onclick="enviarWhatsApp(${o.numOS})"><i class="fa-brands fa-whatsapp"></i></button>
+                                <button class="btn-tbl btn-tbl-edit" title="Editar OS" onclick="abrirModalOS(${o.numOS})"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-tbl btn-tbl-delete" title="Excluir OS" onclick="excluirOS(${o.numOS})"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function atualizarMetrics() {
+            document.getElementById('total-os').innerText = dadosOS.length;
+            document.getElementById('aberto-os').innerText = dadosOS.filter(o => o.status === 'Aberto').length;
+            document.getElementById('pendentes-os').innerText = dadosOS.filter(o => o.status === 'Pendente').length;
+            document.getElementById('concluidas-os').innerText = dadosOS.filter(o => o.status === 'Fechado').length;
+
+            const totalFaturado = dadosOS
+                .filter(o => o.status === 'Fechado')
+                .reduce((acc, curr) => acc + (curr.valorTotal || 0), 0);
+
+            document.getElementById('faturamento-os').innerText = `R$ ${totalFaturado.toFixed(2)}`;
+        }
+
+        async function excluirOS(numOS) {
+            if (confirm(`Deseja excluir Ordem de Serviço #${numOS}?`)) {
+                dadosOS = dadosOS.filter(o => o.numOS !== numOS);
+                await salvarDadosNoServidor();
+                carregarTabelaOS();
+                atualizarMetrics();
+            }
+        }
+
+        function enviarWhatsApp(numOS) {
+            const os = dadosOS.find(o => o.numOS === numOS);
+            if (!os) return;
+
+            const fone = os.clienteFone.replace(/\D/g, '');
+            const msg = `Olá *${os.clienteNome}*, tudo bem?%0A%0AAtualização da sua *Ordem de Serviço #${os.numOS}* na *3D PRIMUS*:%0A*Equipamento:* ${os.equipamento}%0A*Status:* ${os.status}%0A*Valor Total:* R$ ${(os.valorTotal || 0).toFixed(2)}%0A%0AQualquer dúvida estamos à disposição!`;
+            window.open(`https://api.whatsapp.com/send?phone=55${fone}&text=${msg}`, '_blank');
+        }
+
+        async function salvarGarantia() {
+            termosGarantia = document.getElementById('textoGarantia').value;
+            await salvarDadosNoServidor();
+            alert('Termos de garantia atualizados com sucesso!');
+        }
+
+        async function fazerBackup() {
+            await carregarDadosDoServidor();
+            let res = await fetch(API_URL);
+            let dadosCompletos = await res.json().catch(() => ({}));
+            
+            const blob = new Blob([JSON.stringify(dadosCompletos, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_3dprimus_os_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+        }
+
+        /* IMPRESSÃO DE ORDEM DE SERVIÇO EM 2 VIAS NA MESMA FOLHA (COMPACTO A4) */
+        function imprimirOS2Vias(numOS) {
+            const os = dadosOS.find(o => o.numOS === numOS);
+            if (!os) return;
+
+            const printArea = document.getElementById('printableOS');
+            const garantiaTexto = os.garantia || termosGarantia || '';
+
+            const blocoVia = (tipoVia) => `
+                <div style="border: 1px dashed #333; padding: 12px; height: 47vh; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; font-family: Arial, sans-serif; font-size: 11px; background: #fff;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1.5px solid #000; padding-bottom: 5px; margin-bottom: 8px;">
+                            <div>
+                                <h2 style="margin:0; font-size: 14px; color: #10243a;">3D PRIMUS - ASSISTÊNCIA TÉCNICA</h2>
+                                <p style="margin: 2px 0; font-size: 10px;">Rua Luís Domingues, nº 1158 - Centro | Tel: (99) 98178-0355</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 13px; font-weight: bold; color: #1769aa;">OS #${os.numOS}</div>
+                                <div style="font-size: 10px;">Data: ${os.dataEntrada}</div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 6px; margin-bottom: 6px;">
+                            <div style="border: 1px solid #ccc; padding: 5px;"><strong>Cliente:</strong> ${os.clienteNome}</div>
+                            <div style="border: 1px solid #ccc; padding: 5px;"><strong>Telefone:</strong> ${os.clienteFone}</div>
+                        </div>
+
+                        <div style="border: 1px solid #ccc; padding: 5px; margin-bottom: 6px;">
+                            <strong>Equipamento [${os.equipmentType || 'Outros'}]:</strong> ${os.equipamento} (Marca/Mod: ${os.marca || '-'} / ${os.modelo || '-'})
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+                            <div style="border: 1px solid #ccc; padding: 5px; min-height: 28px;"><strong>Defeito:</strong> ${os.defeito || 'Nenhum'}</div>
+                            <div style="border: 1px solid #ccc; padding: 5px; min-height: 28px;"><strong>Serviço/Procedimento:</strong> ${os.servico || 'Em análise'}</div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; border: 1px solid #ccc; padding: 5px; background: #f8fafc; font-weight: bold;">
+                            <span>Status: ${os.status}</span>
+                            <span style="color: #059669;">VALOR TOTAL: R$ ${(os.valorTotal || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="font-size: 8.5px; color: #444; border-top: 1px dotted #ccc; padding-top: 3px; margin-bottom: 8px; max-height: 32px; overflow: hidden;">
+                            <strong>Garantia:</strong> ${garantiaTexto}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                            <div style="width: 45%; border-top: 1px solid #000; text-align: center; font-size: 9px; padding-top: 2px;">Assinatura da Loja</div>
+                            <div style="width: 45%; border-top: 1px solid #000; text-align: center; font-size: 9px; padding-top: 2px;">Assinatura do Cliente</div>
+                        </div>
+                        <div style="text-align: center; font-size: 8px; color: #666; margin-top: 4px;">3D Primus — <strong>${tipoVia}</strong></div>
+                    </div>
+                </div>
+            `;
+
+            printArea.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${blocoVia('VIA DO CLIENTE')}
+                    ${blocoVia('VIA DA LOJA (CONTROLO INTERNO)')}
+                </div>
+            `;
+
+            printArea.style.display = 'block';
+            window.print();
+            printArea.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
