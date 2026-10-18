@@ -1,5 +1,5 @@
 // CONEXÃO COM O BANCO DE DADOS LOCAL NA PASTA (VIA NODE.JS)
-const API_URL = 'http://localhost:3000/api/data';
+const API_URL = '/api/data';
 
 let orders = [];
 let costItems = [];
